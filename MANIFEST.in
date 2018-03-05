@@ -1,0 +1,3 @@
+graft google/templates
+graft google/static
+include google/schema.sql

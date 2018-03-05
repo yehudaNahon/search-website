@@ -1,0 +1,13 @@
+MANIFEST.in
+google/__init__.py
+google/google.py
+google/schema.sql
+google.egg-info/PKG-INFO
+google.egg-info/SOURCES.txt
+google.egg-info/dependency_links.txt
+google.egg-info/requires.txt
+google.egg-info/top_level.txt
+google/static/style.css
+google/templates/layout.html
+google/templates/login.html
+google/templates/show_entries.html
