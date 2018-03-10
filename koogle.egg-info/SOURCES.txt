@@ -1,0 +1,13 @@
+MANIFEST.in
+koogle/__init__.py
+koogle/koogle.py
+koogle/schema.sql
+koogle.egg-info/PKG-INFO
+koogle.egg-info/SOURCES.txt
+koogle.egg-info/dependency_links.txt
+koogle.egg-info/requires.txt
+koogle.egg-info/top_level.txt
+koogle/static/style.css
+koogle/templates/layout.html
+koogle/templates/login.html
+koogle/templates/show_entries.html

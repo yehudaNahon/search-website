@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <ul class=documents>
+        {% for document in documents %}
+          <li>
+            <h2><a href="{{document.link}}">{{document.name}}</a></h2>
+            <a class="visible" href="{{document.link}}">{{document.link}}</a>
+            <p>{{document.content}}</p>
+          </li>
+        {% else %}
+          <li><em>Unbelievable.  No entries here so far</em>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Koogle</title>
+  <link rel=stylesheet type=text/css href="../static/style.css">
+</head>
+
+<body>
+  <div class=page>
+    <div class="topnav">
+      <a class="active" href="{{ url_for('home') }}">Koogle</a>
+      <form action="{{ url_for('search') }}" method="POST">
+        <input type="text" name="search" placeholder="judah" />
+      </form>
+      <a class="menu" href="{{ url_for('logout') }}">log out</a>
+      <a class="menu" href="{{url_for('menage')}}">menage</a>
+
+    </div>
+  </div>
+  <ul class=documents>
+    <li>
+      <h2 class=result-name>
+        <a href=#home>Judah</a>
+      </h2>
+      <a class=visible href=#home>https://www.google.co.il/search?q=flask+live+update&oq=flask+live+update&aqs=chrome..69i57.4869j0j7&sourceid=chrome&ie=UTF-8</a>
+      <p class=summry>Lorem ipsum dolor sit amet consectetur adipisicing elit. Assumenda ad accusantium ipsa repellat quasi officiis qui
+        quam tenetur ullam, voluptates, animi quisquam, nihil doloribus magnam! Placeat doloremque nostrum quo perferendis
+        blanditiis dicta iusto? Placeat assumenda temporibus corrupti eius reprehenderit itaque deserunt doloremque! Esse
+        ut cum vitae deleniti eaque, aliquid officia ad, corporis sint amet unde fugit suscipit iste laboriosam. Distinctio
+        accusantium quae ipsam quod alias voluptatibus ut voluptates inventore, illo accusamus. Molestias sunt laborum, quos
+        est rerum corrupti voluptates aut ab quod, eius odit repellat exercitationem provident voluptate magnam ducimus consequuntur
+        et odio rem nam minima molestiae sint. Dolor omnis deleniti ab quaerat voluptatem molestias. Enim, expedita aliquam.
+        Sint necessitatibus odio, expedita eveniet mollitia officiis quos similique perferendis voluptas repudiandae ea inventore,
+        eum porro. Consequuntur commodi explicabo ducimus in nisi molestiae libero minus aliquid atque, quidem assumenda
+        nesciunt quasi, natus iusto laboriosam perferendis voluptates repellendus cum! Veniam id nostrum sed!</p>
+    </li>
+  </ul>
+  </div>
+</body>
+
+</html>

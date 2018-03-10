@@ -1,0 +1,11 @@
+ul {list-style-type: none;}
+
+h2 {font-size: 1.5em}
+
+.documents li{padding: 0em 1em ; margin: 0em;}
+.documents p {font-size: .9em; color: grey; margin: .5em 0em; padding-right: 10em;}
+.documents a.visible {font-size: .9em; margin: 0em; color: green}
+.documents h2 {color: blue; margin: 0em;}
+
+
+

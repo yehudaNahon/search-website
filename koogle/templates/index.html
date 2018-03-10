@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if session.logged_in %}
+
+<p>Add New Link:</p>
+<form action="{{ url_for('add_entry') }}" method="post">
+    <input type=text name=link>
+    <input type=submit value=Add>
+</form>
+
+<br>
+
+<table class=table>
+  <tr class="header">
+    <th></th>
+    <th>File</th>
+  </tr>
+  {% for file in files %}
+  <tr>
+    <td><input type=checkbox name=check></td>
+    <td>{{file.title}}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+<p>Add New Word:</p>
+<form action="{{ url_for('add_word') }}" method="post">
+    <input type=text name=word>
+    <input type=submit value=Add>
+</form>
+
+<br>
+
+<table class=table>
+  <tr class="header">
+    <th></th>
+    <th>Words</th>
+  </tr>
+  {% for word in words %}
+  <tr>
+    <td><input type=checkbox name=check></td>
+    <td>{{word}}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+{% else %}
+
+{%endif%}
+
+{% endblock %}

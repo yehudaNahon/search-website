@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name='google',
-    packages=['google'],
+    name='koogle',
+    packages=['koogle'],
     include_package_data=True,
     install_requires=[
         'flask',
