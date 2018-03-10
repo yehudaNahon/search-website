@@ -11,8 +11,9 @@ import itertools
 from logging import error, info
 import requests
 import bs4
+from bs4.element import Comment
 
-SPLIT_PATTERN = '|'.join(['\t', '\n', ' ', ',', '\\.', ';', ':', '"', '\\\\', '!', '\\?', '_'])
+SPLIT_PATTERN = '|'.join(['\r','\t', '\n', ' ', ',', '\\.', ';', ':', '\"', '\\\\', '!', '\\?', '_'])
 
 operations = {
     'not': (lambda first, second: 
@@ -48,14 +49,24 @@ def levenshtein_distance(s1, s2):
     return distances[-1]
 
 
+def tag_visible(element):
+    if element.parent.name in ['style', 'script', 'head', 'title', 'meta', '[document]']:
+        return False
+    if isinstance(element, Comment):
+        return False
+    return True
+
+
 def get_html_text(link):
     # get the file and scrape it from html tags
     file_data = requests.get(link, allow_redirects=True)
-    soup = bs4.BeautifulSoup(file_data.content, 'lxml')
+
+    soup = bs4.BeautifulSoup(file_data.content, 'html.parser')
+    texts = soup.findAll(text=True)
     header = soup.find('title').text.strip()
 
-    [s.extract() for s in soup(['style', 'script', '[document]', 'head', 'title'])]
-    visible_text = soup.getText()
+    visible_texts = filter(tag_visible, texts)  
+    visible_text = u" ".join(t.strip() for t in visible_texts)
 
     info = (header.encode('ascii', 'ignore'), visible_text.encode('ascii', 'ignore'))
 
@@ -107,6 +118,8 @@ class Index:
             terms = list(map(str.lower, terms))
             
             terms.sort()
+
+            print([(term, doc_id, terms.count(term)) for term in set(terms) if len(term) > 1])
 
             # Aggregate duplicates and append them to the total list.
             # Notice how we ignore short terms (single character)
@@ -173,25 +186,27 @@ class Index:
         term_table = self.get_term_table(term.lower())
         if term_table is None:
             error("no term table for term")
-            return None
+            return list()
 
         query = self.db.execute("SELECT document_id FROM {tbl} ORDER BY hits DESC".format(tbl=term_table))
         return [id[0] for id in query.fetchall()]
         
     def search(self, query):
-        query = query.strip()
+        query = query.strip().lower()
         print(query)
 
         if explicit_word_re.match(query):
             word = explicit_word_re.findall(query)[0]
-            return self.search_term(word)
+            matches = self.search_term(word)
+            return matches
 
         # check if the query is a single word query exmp : "word"
         if word_re.match(query):
             word = word_re.findall(query)[0]
             if self.is_word_in_blacklist(word):
                 return list()
-            return self.search_term(word)
+            matches = self.search_term(word)
+            return matches
             
         if complex_query_re.match(query):
             first_exp, operation, second_exp = complex_query_re.findall(query)[0]
@@ -206,15 +221,15 @@ class Index:
             else:
                 second_lst = self.search(second_exp)
 
-            if type(first_lst) is list and operation in operations and type(second_lst) is list:
-                return operations[operation](first_lst, second_lst)
+            if operation in operations:
+                matches = operations[operation](first_lst, second_lst)
+                return matches
             else:
-                return None
+                return list()
 
     def get_search_words(self, query):
         query = query.strip()
-        print(query)
-
+        
         if explicit_word_re.match(query):
             word = explicit_word_re.findall(query)[0]
             return [word]

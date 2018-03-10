@@ -12,18 +12,17 @@
 <br>
 
 <table class=table>
-    <h3>File</h3>
+    <h3>Pennding For Removale</h3>
   {% for file in files %}
   <tr>
     <tb><p>{{file.title}}</p>
-    <form action="{{url_for('reactivate_file')}}" method="POST">
-        <button value={{file.id}}>Reactivate</button>
+    <form action="{{ url_for('reactivate_file') }}" method="POST">
+        <button value={{file.id}} name="btn" >Reactivate</button>
     </form>
     </tb>
   </tr>
   {% endfor %}
 </table>
-
 
 <p>Add New Word:</p>
 <form action="{{ url_for('add_word') }}" method="post">
@@ -34,7 +33,7 @@
 <br>
 
 <table class=table>
-    <h3>Words</h3>
+    <h3>Stop Words</h3>
     {% for word in words %}
         <tr>
             <td>{{word}}</td>

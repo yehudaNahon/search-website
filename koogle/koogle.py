@@ -118,6 +118,6 @@ def remove_file():
 
 @app.route('/reactivate_file', methods=['POST'])
 def reactivate_file():
-    id = request.form['btn']
-    index_engine.activate_file(id)
+    doc_id = request.form['btn']
+    index_engine.activate_file(doc_id)
     return redirect(url_for('home'))
