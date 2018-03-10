@@ -6,7 +6,12 @@
           <li>
             <h2><a href="{{document.link}}">{{document.name}}</a></h2>
             <a class="visible" href="{{document.link}}">{{document.link}}</a>
-            <p>{{document.content}}</p>
+            <p id = "text" >{{document.content}}</p>    
+            {% if session.logged_in %}
+            <form action="{{url_for('remove_file')}}" method="POST">
+              <button value={{document.id}} name="btn">Remove</button>
+            </form>
+          {% endif %}
           </li>
         {% else %}
           <li><em>Unbelievable.  No entries here so far</em>

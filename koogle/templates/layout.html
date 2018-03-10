@@ -7,16 +7,23 @@
   <title>Koogle</title>
 
   <!-- bootstap -->
+  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
   <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
   <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 
 
   <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-  <script type="text/javascript" src="{{ url_for('static', filename='scripts.js') }}"></script>
 
+  <script>
+    function render(){
+    var words = ['sleep']
+    var html = document.getElementById("text")
+    for(word in words){
+      document.getElementById("text").innerHTML = html.innerHTML.replace(word, "<b>" + word + "</b>")
+    }}
+  </script>
 </head>
-<body>
+<body onload=render();>
     <nav class="navbar navbar-default" role="navigation">
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">

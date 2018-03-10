@@ -23,7 +23,7 @@ operations = {
 
 word_re = re.compile("^([a-zA-Z1-9]+)$")
 explicit_word_re = re.compile("^\"([a-zA-Z1-9]+)\"$")
-complex_query_re = re.compile("([a-zA-Z1-9]+|\(.+\))\s+(" + '|'.join(operations.keys()) + ")\s+([a-zA-Z1-9]+|\(.+\))")
+complex_query_re = re.compile("([a-zA-Z1-9\"]+|\(.+\))\s+(" + '|'.join(operations.keys()) + ")\s+([a-zA-Z1-9\"]+|\(.+\))")
 expr_pattern = "\(.+\)"
 
 
@@ -84,7 +84,7 @@ class Index:
             self.db.execute("CREATE UNIQUE INDEX term_index ON terms(term);")
 
         if not table_exists(self.db, 'documents'):
-            self.db.execute("CREATE TABLE documents (title TEXT NOT NULL, link TEXT NOT NULL);")
+            self.db.execute("CREATE TABLE documents (title TEXT NOT NULL, link TEXT NOT NULL, preview TEXT, active INT );")
 
         if not table_exists(self.db, 'blacklist'):
             self.db.execute("CREATE TABLE blacklist (word TEXT NOT NULL);")
@@ -100,7 +100,7 @@ class Index:
             title, content = get_html_text(link)
 
             # insert to the db the author and the title -> it's index  exmp: 0
-            doc_id = self.db.execute('''INSERT INTO documents (title, link) VALUES (?, ?)''', (title, link)).lastrowid
+            doc_id = self.db.execute('''INSERT INTO documents (title, link, preview, active) VALUES (?, ?, ?, ?)''', (title, link, content[:1000], 1)).lastrowid
             
             terms = re.split(SPLIT_PATTERN, content) + re.split(SPLIT_PATTERN, title)
             
@@ -170,7 +170,7 @@ class Index:
         return term_id
 
     def search_term(self, term):
-        term_table = self.get_term_table(term)
+        term_table = self.get_term_table(term.lower())
         if term_table is None:
             error("no term table for term")
             return None
@@ -180,6 +180,7 @@ class Index:
         
     def search(self, query):
         query = query.strip()
+        print(query)
 
         if explicit_word_re.match(query):
             word = explicit_word_re.findall(query)[0]
@@ -210,16 +211,52 @@ class Index:
             else:
                 return None
 
+    def get_search_words(self, query):
+        query = query.strip()
+        print(query)
+
+        if explicit_word_re.match(query):
+            word = explicit_word_re.findall(query)[0]
+            return [word]
+
+        # check if the query is a single word query exmp : "word"
+        if word_re.match(query):
+            word = word_re.findall(query)[0]
+            if self.is_word_in_blacklist(word):
+                return list()
+            return [word]
+            
+        if complex_query_re.match(query):
+            first_exp, operation, second_exp = complex_query_re.findall(query)[0]
+            
+            if re.match(expr_pattern, first_exp):
+                first_lst = self.search(first_exp[1:-1])
+            else:
+                first_lst = self.search(first_exp)
+
+            if re.match(expr_pattern, second_exp):
+                second_lst = self.search(second_exp[1:-1])
+            else:
+                second_lst = self.search(second_exp)
+
+            if type(first_lst) is list and type(second_lst) is list:
+                return first_lst + second_lst
+            else:
+                return list()
+
     def similar_terms(self, term):
         return self.db.execute('''
             SELECT * FROM terms WHERE levenshtein_distance(?, term) < 3;
         ''', (term, ))
 
+    def get_inactive_files(self):
+        return self.db.execute("select title, link, preview, rowid from documents where active == 0").fetchall()
+
     def get_files(self):
-        return self.db.execute("select title, link from documents").fetchall()
+        return self.db.execute("select title, link, active preview from documents").fetchall()
 
     def get_file_info(self, file_id):
-        query = self.db.execute("select title, link from documents where rowid = ?", str(file_id))
+        query = self.db.execute("select title, link, preview, active from documents where rowid = ?", str(file_id))
         file_list = query.fetchall()
         if len(file_list) == 0:
             error("no files found")
@@ -235,7 +272,8 @@ class Index:
             return False
 
         return True
-    
+
+
     def get_blacklist(self):
         return [word[0] for word in self.db.execute("select word from blacklist").fetchall()]
 
@@ -244,7 +282,11 @@ class Index:
             self.db.execute("insert into blacklist(word) values (?)", (word,))
             self.db.commit()
 
+    def activate_file(self, doc_id):
+        self.db.execute("update documents set active = 1 where rowid = ?", (doc_id,))
 
+    def remove_file(self, doc_id):
+        self.db.execute("update documents set active = 0 where rowid = ?", (doc_id,))
 
 
 #################################################

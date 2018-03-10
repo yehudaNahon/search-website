@@ -1,12 +1,10 @@
 # all the imports
-import gzip
+import re
 import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
 from DBManager import Index, get_html_text
-from wtforms import *
-from forms import SearchForm
 
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file , flaskr.py
@@ -36,8 +34,8 @@ def home():
     blacklist = index_engine.get_blacklist()
     print(blacklist)
 
-    files = index_engine.get_files()
-    files = [{'title': title} for title, link in files]
+    files = index_engine.get_inactive_files()
+    files = [{'title': title, 'id': id} for title, link, preview, id in files]
 
     print(files)
 
@@ -47,6 +45,7 @@ def home():
 def search():
     query = request.form['search']
     files = index_engine.search(query)
+    words = index_engine.get_search_words(query)
 
     if files is None:
         return render_template('search_results.html', query=query)
@@ -54,19 +53,16 @@ def search():
     documents = list()
 
     for file_id in files:
-        title, link = index_engine.get_file_info(file_id)
-
-        _, text = get_html_text(link)
+        title, link, text, active = index_engine.get_file_info(file_id)        
         
-        
-        if len(text) > 1000:
-            text = text[:1000] + '...'
-
-        documents.append({'name': title, 'content': text, 'link': link})
+        if active == 1:
+            text = ' '.join(re.sub("[^\w]", " ",  text).split())
+            documents.append({'name': title, 'content': text, 'link': link, 'id': file_id})
     
     return render_template('search_results.html',
                            query=query,
-                           documents=documents)
+                           documents=documents,
+                           words=['as', 'in'])
 
 
 @app.route('/add_entry', methods=['POST'])
@@ -85,8 +81,6 @@ def add_entry():
 def add_word():
     if not session.get('logged_in'):
         abort(401)
-
-    print("ds;lgfksd;lgfksl;agfdk;lkg")
 
     word = request.form['word']
 
@@ -115,5 +109,15 @@ def logout():
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
+@app.route('/remove_file', methods=['POST'])
+def remove_file():
+    id = request.form['btn']
+    index_engine.remove_file(id)
+    return redirect(url_for('home'))
 
 
+@app.route('/reactivate_file', methods=['POST'])
+def reactivate_file():
+    id = request.form['btn']
+    index_engine.activate_file(id)
+    return redirect(url_for('home'))

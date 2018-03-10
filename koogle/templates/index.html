@@ -12,14 +12,14 @@
 <br>
 
 <table class=table>
-  <tr class="header">
-    <th></th>
-    <th>File</th>
-  </tr>
+    <h3>File</h3>
   {% for file in files %}
   <tr>
-    <td><input type=checkbox name=check></td>
-    <td>{{file.title}}</td>
+    <tb><p>{{file.title}}</p>
+    <form action="{{url_for('reactivate_file')}}" method="POST">
+        <button value={{file.id}}>Reactivate</button>
+    </form>
+    </tb>
   </tr>
   {% endfor %}
 </table>
@@ -34,15 +34,11 @@
 <br>
 
 <table class=table>
-  <tr class="header">
-    <th></th>
-    <th>Words</th>
-  </tr>
-  {% for word in words %}
-  <tr>
-    <td><input type=checkbox name=check></td>
-    <td>{{word}}</td>
-  </tr>
+    <h3>Words</h3>
+    {% for word in words %}
+        <tr>
+            <td>{{word}}</td>
+        </tr>
   {% endfor %}
 </table>
 

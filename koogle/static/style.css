@@ -7,5 +7,8 @@ h2 {font-size: 1.5em}
 .documents a.visible {font-size: .9em; margin: 0em; color: green}
 .documents h2 {color: blue; margin: 0em;}
 
+.highlight {color:red;}
 
-
+.file-menu {
+    float: left;
+}
